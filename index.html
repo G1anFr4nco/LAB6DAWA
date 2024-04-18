@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat con Socket.IO y Bootstrap</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Chat</h1>
+
+        <!-- Chat 1 -->
+        <div class="card mb-3">
+            <div class="card-header">Chat 1</div>
+            <div class="card-body">
+                <form id="formChat1">
+                    <div class="form-group">
+                        <label for="nombre1">Nombre</label>
+                        <input type="text" class="form-control" id="nombre1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="foto-url1">URL de la foto de perfil</label>
+                        <input type="url" class="form-control" id="foto-url1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mensaje1">Mensaje</label>
+                        <input type="text" class="form-control" id="mensaje1" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Chat 2 -->
+        <div class="card mb-3">
+            <div class="card-header">Chat 2</div>
+            <div class="card-body">
+                <form id="formChat2">
+                    <div class="form-group">
+                        <label for="nombre2">Nombre</label>
+                        <input type="text" class="form-control" id="nombre2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="foto-url2">URL de la foto de perfil</label>
+                        <input type="url" class="form-control" id="foto-url2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mensaje2">Mensaje</label>
+                        <input type="text" class="form-control" id="mensaje2" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Mensajes -->
+        <div class="card">
+            <div class="card-header">Mensajes</div>
+            <ul id="lista-mensajes" class="list-group list-group-flush"></ul>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        var socket = io();
+
+        // Función para enviar mensajes del chat 1
+        $('#formChat1').submit(function(e){
+            e.preventDefault();
+            var nombre = $('#nombre1').val();
+            var fotoURL = $('#foto-url1').val();
+            var mensaje = $('#mensaje1').val();
+            var hora = new Date().toLocaleTimeString();
+
+            var data = {
+                nombre: nombre,
+                fotoURL: fotoURL,
+                mensaje: mensaje,
+                hora: hora
+            };
+
+            socket.emit('chat message 1', data);
+            $('#mensaje1').val('');
+        });
+
+        // Función para enviar mensajes del chat 2
+        $('#formChat2').submit(function(e){
+            e.preventDefault();
+            var nombre = $('#nombre2').val();
+            var fotoURL = $('#foto-url2').val();
+            var mensaje = $('#mensaje2').val();
+            var hora = new Date().toLocaleTimeString();
+
+            var data = {
+                nombre: nombre,
+                fotoURL: fotoURL,
+                mensaje: mensaje,
+                hora: hora
+            };
+
+            socket.emit('chat message 2', data);
+            $('#mensaje2').val('');
+        });
+
+        // Escuchar mensajes del chat 1
+        socket.on('chat message 1', function(data){
+            var mensaje = "<li class='list-group-item d-flex align-items-center'><img src='" + data.fotoURL + "' class='rounded-circle mr-3' style='width: 50px; height: 50px;' /><strong>" + data.nombre + " (" + data.hora + "):</strong> " + data.mensaje + "</li>";
+            $('#lista-mensajes').append(mensaje);
+        });
+
+        // Escuchar mensajes del chat 2
+        socket.on('chat message 2', function(data){
+            var mensaje = "<li class='list-group-item d-flex align-items-center justify-content-end'><strong>" + data.nombre + " (" + data.hora + "):</strong> " + data.mensaje + " <img src='" + data.fotoURL + "' class='rounded-circle ml-3' style='width: 50px; height: 50px;' /></li>";
+            $('#lista-mensajes').append(mensaje);
+        });
+    </script>
+</body>
+
+</html>
